@@ -6181,7 +6181,10 @@ class SparkCliTests(unittest.TestCase):
     def test_live_run_external_ingress_targets_spawner_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir, \
              patch("spark_cli.cli.CONFIG_PATH", Path(tmp_dir) / "setup.json"):
-            save_json(Path(tmp_dir) / "setup.json", {"telegram_ingress_mode": "external"})
+            (Path(tmp_dir) / "setup.json").write_text(
+                json.dumps({"telegram_ingress_mode": "external"}),
+                encoding="utf-8",
+            )
             args = build_parser().parse_args(["live", "run", "--lines", "5"])
 
             with patch("spark_cli.cli.cmd_start", return_value=0) as start, \
@@ -6195,7 +6198,10 @@ class SparkCliTests(unittest.TestCase):
     def test_live_restart_external_ingress_targets_spawner_only(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir, \
              patch("spark_cli.cli.CONFIG_PATH", Path(tmp_dir) / "setup.json"):
-            save_json(Path(tmp_dir) / "setup.json", {"telegram_ingress_mode": "external"})
+            (Path(tmp_dir) / "setup.json").write_text(
+                json.dumps({"telegram_ingress_mode": "external"}),
+                encoding="utf-8",
+            )
             args = build_parser().parse_args(["live", "restart"])
 
             with patch("spark_cli.cli.cmd_restart", return_value=0) as restart:
