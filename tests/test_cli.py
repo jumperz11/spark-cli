@@ -1602,6 +1602,19 @@ class SparkCliTests(unittest.TestCase):
                 self.assertEqual(main(["config", "get", "feature.missing"]), 1)
             self.assertEqual(stdout.getvalue().strip(), "feature.missing is not set")
 
+    def test_config_get_rejects_invalid_dotted_key(self) -> None:
+        with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmp_dir:
+            config_path = Path(tmp_dir) / "config.json"
+            config_path.write_text('{"feature":{"flag":null}}\n', encoding="utf-8")
+            with (
+                patch("spark_cli.cli.USER_CONFIG_PATH", config_path),
+                patch("sys.stdout", new_callable=StringIO) as stdout,
+                patch("sys.stderr", new_callable=StringIO) as stderr,
+            ):
+                self.assertEqual(main(["config", "get", "feature..flag"]), 1)
+            self.assertEqual(stdout.getvalue().strip(), "")
+            self.assertEqual(stderr.getvalue().strip(), "Error: config key must contain non-empty dot-separated segments")
+
     def test_load_json_accepts_utf8_bom_from_windows_tools(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             path = Path(tmp_dir) / "registry.json"

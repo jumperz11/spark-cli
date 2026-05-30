@@ -14728,6 +14728,11 @@ def coerce_config_value(raw: str) -> Any:
 
 
 def cmd_config_get(args: argparse.Namespace) -> int:
+    try:
+        validate_config_key(args.key)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
     missing = object()
     value = dotted_get(load_user_config(), args.key, default=missing)
     if value is missing:

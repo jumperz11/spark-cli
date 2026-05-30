@@ -1,0 +1,103 @@
+{
+  "schema": "spark-compete-hotfix-v1",
+  "event": "spark-compete-first-event",
+  "submission_mode": "public_repo_pr",
+  "submission_target_url": "https://github.com/vibeforge1111/spark-cli/pull/438",
+  "team": {
+    "name": "JUMPERZ",
+    "members": [
+      "JUMPERZ",
+      "Basjee01",
+      "acexqt"
+    ],
+    "llm_device_holder": "JUMPERZ",
+    "device_holder_github": "https://github.com/jumperz11",
+    "github_accounts": [
+      "jumperz11",
+      "Basjee01",
+      "acexqt"
+    ]
+  },
+  "target_repo": {
+    "id": "vibeforge1111/spark-cli",
+    "source": "https://github.com/vibeforge1111/spark-cli",
+    "owner_surface": "spark-cli"
+  },
+  "issue": {
+    "type": "bug",
+    "severity": "low",
+    "title": "spark config get accepts malformed dotted keys",
+    "actual_behavior": "`spark config get` accepted malformed keys like `feature..flag` and treated them as missing, printing `<key> is not set` instead of reporting invalid key syntax.",
+    "expected_behavior": "`spark config get` should validate key syntax like `set` and `unset`, returning an explicit validation error for malformed dotted keys.",
+    "repro_steps": [
+      "Run `PYTHONPATH=src HOME=<tmp_home> python -m spark_cli.cli config get feature..flag` on pre-fix behavior.",
+      "Observe output `feature..flag is not set` and exit code 1, with no key-format error.",
+      "Run the same command after this fix and observe `Error: config key must contain non-empty dot-separated segments` on stderr with exit code 1."
+    ],
+    "affected_workflow": "Operator config inspection and automation that expects invalid-key input to fail with explicit validation, matching `config set`/`unset`."
+  },
+  "evidence": {
+    "safe_links_only": true,
+    "before_after_proof": "Before: malformed keys were silently treated as missing in `config get`. After: malformed keys are rejected consistently with `config set` and `config unset`.",
+    "links": [
+      "https://github.com/vibeforge1111/spark-cli/pull/438"
+    ],
+    "forbidden": [
+      "pdf",
+      "zip",
+      "exe",
+      "unknown downloads",
+      "shortened links",
+      "archives",
+      "binaries",
+      "tokens",
+      "browser cookies",
+      "wallet material",
+      "raw logs",
+      "raw conversations",
+      "raw memory",
+      "raw patches",
+      "private repo maps",
+      "private scoring details"
+    ]
+  },
+  "proposed_fix": {
+    "approach": "Validate dotted key format at the top of `cmd_config_get` using `validate_config_key`, then return the same error style already used by `config set` and `config unset`.",
+    "files_expected": [
+      "src/spark_cli/cli.py",
+      "tests/test_cli.py",
+      "docs/STATUS.md"
+    ],
+    "tests_or_smoke": "PYTHONPATH=src python -m pytest tests/test_cli.py -q -k \"config_get_reports_json_null_as_present_value or config_get_missing_key_still_reports_not_set or config_get_rejects_invalid_dotted_key\"; python -m compileall src tests; git diff --check"
+  },
+  "pr": {
+    "branch": "codex/isolate-live-command-config-tests",
+    "title_prefix": "[spark-compete]",
+    "author_github": "jumperz11",
+    "body_must_include": [
+      "packet",
+      "team",
+      "pr_author",
+      "repo",
+      "actual_behavior",
+      "expected_behavior",
+      "repro_steps",
+      "before_after_proof",
+      "tests_or_smoke",
+      "duplicate_notes",
+      "risk_notes",
+      "review_claim"
+    ],
+    "url": "https://github.com/vibeforge1111/spark-cli/pull/438"
+  },
+  "review_claim": {
+    "impact_claim": "low",
+    "evidence_types": [
+      "passing_test",
+      "smoke_test"
+    ],
+    "duplicate_notes": "Searched existing config tests and command behavior coverage; malformed key validation existed for set/unset but not get.",
+    "risk_notes": "Small CLI validation behavior adjustment in `cmd_config_get` only. No installer, registry, secrets storage, runtime, or Spark OS compile logic changed.",
+    "review_state_requested": "pr_review"
+  }
+}
