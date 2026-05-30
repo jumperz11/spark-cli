@@ -282,7 +282,7 @@ update above and in the dedicated sandbox docs.
 |---|---|---|
 | `spark init <name> [--kind python|node]` | `cmd_init`, `scaffold_module_files`, `render_init_spark_toml`, `validate_init_module_name` | `test_validate_init_module_name_*`, `test_render_init_spark_toml_*`, `test_scaffold_module_files_*` |
 | `spark search [query]` with blessed/installed badges | `cmd_search` | — |
-| `spark config get|set|unset|list` with dotted keys + JSON coercion | `cmd_config_*`, `dotted_get`, `dotted_set`, `dotted_unset`, `coerce_config_value` | `test_dotted_*`, `test_coerce_config_value_*` |
+| `spark config get|set|unset|list` with dotted keys + JSON coercion (`config get` prints `null` when a key is explicitly set to JSON null) | `cmd_config_*`, `dotted_get`, `dotted_set`, `dotted_unset`, `coerce_config_value` | `test_dotted_*`, `test_coerce_config_value_*`, `test_config_get_*` |
 
 ---
 

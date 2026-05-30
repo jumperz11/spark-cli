@@ -14728,10 +14728,14 @@ def coerce_config_value(raw: str) -> Any:
 
 
 def cmd_config_get(args: argparse.Namespace) -> int:
-    value = dotted_get(load_user_config(), args.key)
-    if value is None:
+    missing = object()
+    value = dotted_get(load_user_config(), args.key, default=missing)
+    if value is missing:
         print(f"{args.key} is not set")
         return 1
+    if value is None:
+        print("null")
+        return 0
     if isinstance(value, (dict, list)):
         print(json.dumps(value, indent=2))
     else:

@@ -1586,6 +1586,22 @@ class SparkCliTests(unittest.TestCase):
         self.assertEqual(coerce_config_value("[1,2,3]"), [1, 2, 3])
         self.assertEqual(coerce_config_value("sonnet"), "sonnet")
 
+    def test_config_get_reports_json_null_as_present_value(self) -> None:
+        with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmp_dir:
+            config_path = Path(tmp_dir) / "config.json"
+            config_path.write_text('{"feature":{"flag":null}}\n', encoding="utf-8")
+            with patch("spark_cli.cli.USER_CONFIG_PATH", config_path), patch("sys.stdout", new_callable=StringIO) as stdout:
+                self.assertEqual(main(["config", "get", "feature.flag"]), 0)
+            self.assertEqual(stdout.getvalue().strip(), "null")
+
+    def test_config_get_missing_key_still_reports_not_set(self) -> None:
+        with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmp_dir:
+            config_path = Path(tmp_dir) / "config.json"
+            config_path.write_text('{"feature":{"flag":null}}\n', encoding="utf-8")
+            with patch("spark_cli.cli.USER_CONFIG_PATH", config_path), patch("sys.stdout", new_callable=StringIO) as stdout:
+                self.assertEqual(main(["config", "get", "feature.missing"]), 1)
+            self.assertEqual(stdout.getvalue().strip(), "feature.missing is not set")
+
     def test_load_json_accepts_utf8_bom_from_windows_tools(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             path = Path(tmp_dir) / "registry.json"
